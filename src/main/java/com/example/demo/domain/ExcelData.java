@@ -1,5 +1,6 @@
 package com.example.demo.domain;
 
+import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
@@ -24,25 +25,14 @@ import lombok.Data;
 public class ExcelData implements Serializable {
 
     @TableId(type = IdType.AUTO)
-    @ExcelProperty("ID")
-    @ContentStyle(horizontalAlignment = HorizontalAlignmentEnum.CENTER)
     private String id;
-    @ExcelProperty("商品名称")
-    @ColumnWidth(20)
-    @ContentStyle(horizontalAlignment = HorizontalAlignmentEnum.CENTER)
+
     private String name;
-    @ExcelProperty("价格")
-    @ColumnWidth(20)
-    @ContentStyle(horizontalAlignment = HorizontalAlignmentEnum.CENTER)
+
     private BigDecimal price;
-    @ColumnWidth(50)
-    @ContentStyle(horizontalAlignment = HorizontalAlignmentEnum.CENTER)
-    @DateTimeFormat("yyyy年MM月dd日HH时mm分ss秒")
-    @ExcelProperty("生产日期")
+
     private Date onSaleDate;
-    @ExcelProperty("生产商")
-    @ColumnWidth(20)
-    @ContentStyle(horizontalAlignment = HorizontalAlignmentEnum.CENTER)
+
     private String feature;
 
     @TableField(exist = false)

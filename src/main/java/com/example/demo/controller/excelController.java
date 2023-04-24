@@ -7,6 +7,7 @@ import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import com.example.demo.domain.ExcelData;
 import com.example.demo.domain.ExcelTitle;
+import com.example.demo.domain.staticExcelHead;
 import com.example.demo.service.ExcelDataService;
 import com.example.demo.service.ExcelTitleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,16 +83,16 @@ public class excelController {
     @GetMapping("/staticDownload")
     public void exportStaticExcel(HttpServletResponse response) throws IOException {
         // 1.设置表头
-
+        Class<staticExcelHead> excelHead = staticExcelHead.class;
         // 2.处理数据
         List<ExcelData> excelData = excelDataService.selectAllData();
-        // 这里注意 有同学反应使用swagger 会导致各种问题，请直接用浏览器或者用postman
+        // 3.设置响应
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setCharacterEncoding("utf-8");
-        // 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
         String fileName = URLEncoder.encode("测试", "UTF-8").replaceAll("\\+", "%20");
         response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
-        EasyExcel.write(response.getOutputStream(), ExcelData.class).sheet().doWrite(excelData);
+        // 4.写入excel
+        EasyExcel.write(response.getOutputStream(), excelHead).sheet().doWrite(excelData);
 
     }
 }
