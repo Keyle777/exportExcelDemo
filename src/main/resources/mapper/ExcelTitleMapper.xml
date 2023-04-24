@@ -5,7 +5,7 @@
 <mapper namespace="com.example.demo.mapper.ExcelTitleMapper">
 
     <resultMap id="BaseResultMap" type="com.example.demo.domain.ExcelTitle">
-            <id property="id" column="id" jdbcType="INTEGER"/>
+            <id property="id" column="id" jdbcType="VARCHAR"/>
             <result property="fieldname" column="fieldname" jdbcType="VARCHAR"/>
             <result property="displaylabel" column="displaylabel" jdbcType="VARCHAR"/>
     </resultMap>

@@ -31,7 +31,7 @@ public class excelController {
     @Autowired
     ExcelTitleService excelTitleService;
     @GetMapping("/download")
-    public Map<String, String> exportExcel(HttpServletResponse response){
+    public void exportExcel(HttpServletResponse response){
         // 获取表头
         List<ExcelTitle> getAllExcelHead = excelTitleService.selectExcelHead();
         List<String> excelHeadList = getAllExcelHead.stream().map(ExcelTitle::getDisplaylabel).collect(Collectors.toList());
@@ -63,10 +63,6 @@ public class excelController {
             response.reset();
             response.setContentType("application/json");
             response.setCharacterEncoding("utf-8");
-            Map<String, String> map = new HashMap<String, String>();
-            map.put("status", "failure");
-            map.put("message", "下载文件失败" + e.getMessage());
-            return map;
         }finally {
             // 处理流
             if (excelWriter != null) {
@@ -81,10 +77,21 @@ public class excelController {
                 }
             }
         }
-        // 设置return
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("status", "success");
-        map.put("message", "下载文件成功");
-        return map;
+    }
+
+    @GetMapping("/staticDownload")
+    public void exportStaticExcel(HttpServletResponse response) throws IOException {
+        // 1.设置表头
+
+        // 2.处理数据
+        List<ExcelData> excelData = excelDataService.selectAllData();
+        // 这里注意 有同学反应使用swagger 会导致各种问题，请直接用浏览器或者用postman
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("utf-8");
+        // 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
+        String fileName = URLEncoder.encode("测试", "UTF-8").replaceAll("\\+", "%20");
+        response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+        EasyExcel.write(response.getOutputStream(), ExcelData.class).sheet().doWrite(excelData);
+
     }
 }

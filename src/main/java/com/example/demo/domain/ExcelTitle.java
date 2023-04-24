@@ -8,25 +8,25 @@ import java.io.Serializable;
 import lombok.Data;
 
 /**
- * 
+ *
  * @TableName excel_title
  */
 @TableName(value ="excel_title")
 @Data
 public class ExcelTitle implements Serializable {
     /**
-     * 
+     *
      */
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private String id;
 
     /**
-     * 
+     *
      */
     private String fieldname;
 
     /**
-     * 
+     *
      */
     private String displaylabel;
 
