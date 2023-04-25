@@ -18,7 +18,7 @@ public class staticExcelHead {
 
     @ExcelProperty(value = "序号", index = 0)
     @ContentStyle(horizontalAlignment = HorizontalAlignmentEnum.CENTER)
-    private String id;
+    private String index;
 
     @ExcelProperty("商品名称")
     @ColumnWidth(20)

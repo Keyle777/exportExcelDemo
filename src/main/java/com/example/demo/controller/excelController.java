@@ -10,6 +10,8 @@ import com.example.demo.domain.ExcelTitle;
 import com.example.demo.domain.staticExcelHead;
 import com.example.demo.service.ExcelDataService;
 import com.example.demo.service.ExcelTitleService;
+import com.sun.org.apache.bcel.internal.generic.NEW;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +43,14 @@ public class excelController {
         excelHeadList.forEach(h -> excelHead.add(Collections.singletonList(h)));
         // 获取数据
         List<ExcelData> excelData = excelDataService.selectAllData();
+        List<staticExcelHead> staticExcelHeadList = new ArrayList<>();
+        int index = 1;
+        for (ExcelData obj : excelData) {
+            staticExcelHead staticExcelHead = new staticExcelHead();
+            BeanUtils.copyProperties(obj, staticExcelHead);
+            staticExcelHead.setIndex(String.valueOf(index++));
+            staticExcelHeadList.add(staticExcelHead);
+        }
         // 设置导出响应
         String fileName = null;
         try {
@@ -59,7 +69,7 @@ public class excelController {
             excelWriter = EasyExcel.write(response.getOutputStream()).build();
             WriteSheet writeSheet = EasyExcel.writerSheet().registerWriteHandler(new LongestMatchColumnWidthStyleStrategy()).build();
             writeSheet.setHead(excelHead);
-            excelWriter.write(excelData, writeSheet);
+            excelWriter.write(staticExcelHeadList, writeSheet);
         } catch (IOException e) {
             response.reset();
             response.setContentType("application/json");
@@ -86,13 +96,21 @@ public class excelController {
         Class<staticExcelHead> excelHead = staticExcelHead.class;
         // 2.处理数据
         List<ExcelData> excelData = excelDataService.selectAllData();
+        List<staticExcelHead> staticExcelHeadList = new ArrayList<>();
+        int index = 1;
+        for (ExcelData obj : excelData) {
+            staticExcelHead staticExcelHead = new staticExcelHead();
+            BeanUtils.copyProperties(obj, staticExcelHead);
+            staticExcelHead.setIndex(String.valueOf(index++));
+            staticExcelHeadList.add(staticExcelHead);
+        }
         // 3.设置响应
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setCharacterEncoding("utf-8");
         String fileName = URLEncoder.encode("测试", "UTF-8").replaceAll("\\+", "%20");
         response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
         // 4.写入excel
-        EasyExcel.write(response.getOutputStream(), excelHead).sheet().doWrite(excelData);
+        EasyExcel.write(response.getOutputStream(), excelHead).sheet().doWrite(staticExcelHeadList);
 
     }
 }
