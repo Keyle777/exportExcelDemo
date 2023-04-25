@@ -33,6 +33,11 @@ public class excelController {
 
     @Autowired
     ExcelTitleService excelTitleService;
+
+    /**
+     * 获取动态头导出excel
+     * @param response HTTP响应
+     */
     @GetMapping("/download")
     public void exportExcel(HttpServletResponse response){
         // 获取表头
@@ -41,16 +46,8 @@ public class excelController {
         List<List<String>> excelHead = new ArrayList<>();
         excelHead.add(Collections.singletonList("序号"));
         excelHeadList.forEach(h -> excelHead.add(Collections.singletonList(h)));
-        // 获取数据
-        List<ExcelData> excelData = excelDataService.selectAllData();
-        List<staticExcelHead> staticExcelHeadList = new ArrayList<>();
-        int index = 1;
-        for (ExcelData obj : excelData) {
-            staticExcelHead staticExcelHead = new staticExcelHead();
-            BeanUtils.copyProperties(obj, staticExcelHead);
-            staticExcelHead.setIndex(String.valueOf(index++));
-            staticExcelHeadList.add(staticExcelHead);
-        }
+        // 处理数据
+        List<staticExcelHead> staticExcelHeadList = dataProcessing(excelDataService);
         // 设置导出响应
         String fileName = null;
         try {
@@ -90,11 +87,32 @@ public class excelController {
         }
     }
 
+    /**
+     * 静态头导出excel
+     * @param response 响应
+     * @throws IOException 异常IO
+     */
     @GetMapping("/staticDownload")
     public void exportStaticExcel(HttpServletResponse response) throws IOException {
         // 1.设置表头
         Class<staticExcelHead> excelHead = staticExcelHead.class;
         // 2.处理数据
+        List<staticExcelHead> staticExcelHeadList = dataProcessing(excelDataService);
+        // 3.设置响应
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("utf-8");
+        String fileName = URLEncoder.encode("测试", "UTF-8").replaceAll("\\+", "%20");
+        response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+        // 4.写入excel
+        EasyExcel.write(response.getOutputStream(), excelHead).sheet().doWrite(staticExcelHeadList);
+    }
+
+    /**
+     * 数据处理
+     * @param excelDataService 获取excel数据
+     * @return 返回List<staticExcelHead>
+     */
+    private static List<staticExcelHead> dataProcessing(ExcelDataService excelDataService) {
         List<ExcelData> excelData = excelDataService.selectAllData();
         List<staticExcelHead> staticExcelHeadList = new ArrayList<>();
         int index = 1;
@@ -104,13 +122,6 @@ public class excelController {
             staticExcelHead.setIndex(String.valueOf(index++));
             staticExcelHeadList.add(staticExcelHead);
         }
-        // 3.设置响应
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setCharacterEncoding("utf-8");
-        String fileName = URLEncoder.encode("测试", "UTF-8").replaceAll("\\+", "%20");
-        response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
-        // 4.写入excel
-        EasyExcel.write(response.getOutputStream(), excelHead).sheet().doWrite(staticExcelHeadList);
-
+        return staticExcelHeadList;
     }
 }
